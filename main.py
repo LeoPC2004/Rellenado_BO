@@ -30,12 +30,12 @@ def obtener_actividades_pendientes(ruta_bo):
     actividades = []
 
     # K = Num_Actividad
-    # AA = Descripcion_Act
+    # Y = Descripcion_Act
 
     for fila in range(2, ws.max_row + 1):
 
         num_actividad = ws.cell(fila, 11).value
-        descripcion = ws.cell(fila, 27).value
+        descripcion = ws.cell(fila, 25).value
 
         pendiente = (
             descripcion is None

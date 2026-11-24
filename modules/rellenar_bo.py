@@ -131,7 +131,7 @@ def rellenar_bo(
     for fila in range(2, ws_bo.max_row + 1):
 
         actividad = ws_bo.cell(fila, 11).value  # K
-        descripcion_act = ws_bo.cell(fila, 27).value  # AA
+        descripcion_act = ws_bo.cell(fila, 25).value  # Y
 
         if es_pendiente(descripcion_act):
 
@@ -237,20 +237,20 @@ def rellenar_bo(
     # --------------------------------------------------------
 
     # K  = Num_Actividad
-    # AA = Descripcion_Act
-    # AB = Motivo Cliente
-    # AC = Detalle Motivo
-    # AD = Área_Aprueba
-    # AE = Aprobador
-    # AK = Responsable
+    # Y  = Descripcion_Act
+    # Z  = Motivo Cliente
+    # AA = Detalle Motivo
+    # AB = Área_Aprueba
+    # AC = Aprobador
+    # AI = Responsable
 
     COL_ACTIVIDAD = 11
-    COL_DESCRIPCION = 27
-    COL_MOTIVO = 28
-    COL_DETALLE = 29
-    COL_AREA = 30
-    COL_APROBADOR = 31
-    COL_RESPONSABLE = 37
+    COL_DESCRIPCION = 25
+    COL_MOTIVO = 26
+    COL_DETALLE = 27
+    COL_AREA = 28
+    COL_APROBADOR = 29
+    COL_RESPONSABLE = 35
 
     # --------------------------------------------------------
     # 7. CRUZAR, RELLENAR Y REGISTRAR AUDITORÍA
