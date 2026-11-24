@@ -1,0 +1,19 @@
+# No subir archivos Excel de trabajo
+archivos/*.xlsx
+
+# No subir archivos generados
+outputs/*
+
+# No subir registros
+logs/*
+
+# Python
+__pycache__/
+*.pyc
+
+# Entornos virtuales
+venv/
+.venv/
+
+# Credenciales
+.env

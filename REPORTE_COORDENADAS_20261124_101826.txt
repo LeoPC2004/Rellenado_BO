@@ -1,0 +1,62 @@
+======================================================================
+PROSEGUR - REPORTE DE CALIBRACION DE COORDENADAS RPA
+======================================================================
+Usuario : Leonardo-RellenadoBO
+Fecha   : 2026-11-24 10:18:26
+Archivo : C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules/coordenadas.py
+
+CAMBIOS REALIZADOS (15)
+----------------------------------------------------------------------
+01. [2026-11-24 10:13:23] HERRAMIENTAS: (0, 0) -> (455, 123)
+02. [2026-11-24 10:13:33] SIEBEL: (0, 0) -> (545, 216)
+03. [2026-11-24 10:13:44] COORDENADA_1: (0, 0) -> (1062, 685)
+04. [2026-11-24 10:13:49] COORDENADA_2: (0, 0) -> (1223, 685)
+05. [2026-11-24 10:13:56] LOGIN: (0, 0) -> (1353, 684)
+06. [2026-11-24 10:14:30] FACTURAS: (0, 0) -> (1806, 238)
+07. [2026-11-24 10:14:42] CONSULTA_ACTIVIDADES_ARGENTINAS: (0, 0) -> (1743, 434)
+08. [2026-11-24 10:14:56] MODULO_CONSULTA: (0, 0) -> (508, 269)
+09. [2026-11-24 10:15:03] NUM_ACTIVIDAD: (0, 0) -> (190, 322)
+10. [2026-11-24 10:15:23] IR: (0, 0) -> (436, 268)
+11. [2026-11-24 10:16:45] MENU: (0, 0) -> (348, 267)
+12. [2026-11-24 10:16:51] EXPORTAR: (0, 0) -> (368, 619)
+13. [2026-11-24 10:17:15] SIGUIENTE: (0, 0) -> (1695, 847)
+14. [2026-11-24 10:17:22] GUARDAR: (0, 0) -> (1047, 604)
+15. [2026-11-24 10:18:11] CERRAR: (0, 0) -> (1165, 651)
+
+BACKUPS CREADOS
+----------------------------------------------------------------------
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101323.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101333.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101344.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101349.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101356.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101430.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101442.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101456.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101503.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101523.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101645.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101651.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101715.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101722.py
+C:/Users/LeonardoMiguelPachas/Downloads/RPA Rellenado BO/modules\coordenadas_BACKUP_20261124_101811.py
+
+COORDENADAS FINALES
+----------------------------------------------------------------------
+HERRAMIENTAS = (455, 123)
+SIEBEL = (545, 216)
+COORDENADA_1 = (1062, 685)
+COORDENADA_2 = (1223, 685)
+LOGIN = (1353, 684)
+FLECHA_MODULOS = (0, 0)
+FACTURAS = (1806, 238)
+CONSULTA_ACTIVIDADES_ARGENTINAS = (1743, 434)
+MODULO_CONSULTA = (508, 269)
+NUM_ACTIVIDAD = (190, 322)
+IR = (436, 268)
+MENU = (348, 267)
+EXPORTAR = (368, 619)
+SIGUIENTE = (1695, 847)
+GUARDAR = (1047, 604)
+CERRAR = (1165, 651)
+======================================================================
