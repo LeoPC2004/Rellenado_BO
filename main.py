@@ -15,6 +15,23 @@ from modules.rellenar_bo import rellenar_bo
 # OBTENER ACTIVIDADES PENDIENTES DEL BO
 # ============================================================
 
+def es_pendiente_identificacion(valor):
+    """Determina si un campo debe provocar la búsqueda previa en Siebel."""
+    if valor is None or str(valor).strip() == "":
+        return True
+
+    valor_normalizado = str(valor).strip().upper()
+    return valor_normalizado in {"#VALORMÚLTIP", "POR DEFINIR", "N/A"}
+
+
+def fila_requiere_busqueda(valor_descripcion, valor_area):
+    """La fila se consulta si Y (Descripción) O AB (Área_Aprueba) requiere revisión."""
+    return (
+        es_pendiente_identificacion(valor_descripcion)
+        or es_pendiente_identificacion(valor_area)
+    )
+
+
 def obtener_actividades_pendientes(ruta_bo):
 
     print("\nRevisando actividades pendientes del BO...")
@@ -25,38 +42,29 @@ def obtener_actividades_pendientes(ruta_bo):
         data_only=True
     )
 
-    ws = wb[config.HOJA_BO]
+    try:
+        ws = wb[config.HOJA_BO]
+        actividades = []
 
-    actividades = []
+        # K = Num_Actividad | Y = Descripcion_Act | AB = Área_Aprueba
+        for fila in range(2, ws.max_row + 1):
 
-    # K = Num_Actividad
-    # Y = Descripcion_Act
+            num_actividad = ws.cell(fila, 11).value
+            descripcion = ws.cell(fila, 25).value
+            area_aprueba = ws.cell(fila, 28).value
 
-    for fila in range(2, ws.max_row + 1):
+            if fila_requiere_busqueda(descripcion, area_aprueba) and num_actividad is not None:
+                actividad = str(num_actividad).strip()
+                if actividad:
+                    actividades.append(actividad)
 
-        num_actividad = ws.cell(fila, 11).value
-        descripcion = ws.cell(fila, 25).value
-
-        pendiente = (
-            descripcion is None
-            or str(descripcion).strip() == ""
-            or str(descripcion).strip().upper() == "POR DEFINIR"
-        )
-
-        if pendiente and num_actividad is not None:
-
-            actividad = str(num_actividad).strip()
-
-            if actividad:
-                actividades.append(actividad)
-
-    wb.close()
+    finally:
+        wb.close()
 
     # Eliminar IDs repetidos manteniendo el orden
     actividades = list(dict.fromkeys(actividades))
 
     print(f"Actividades pendientes: {len(actividades)}")
-
     return actividades
 
 
@@ -104,18 +112,22 @@ def guardar_registro(cambios, ruta_registro):
             "Num_Actividad",
             "Columna modificada",
             "Valor anterior",
-            "Valor nuevo"
+            "Valor nuevo",
+            "Observacion"
         ])
 
     # Agregar modificaciones
     for cambio in cambios:
 
+        # Compatibilidad con registros existentes de 5 columnas:
+        # si la hoja ya tiene encabezados, agrega Observacion cuando corresponda.
         ws.append([
             fecha_ejecucion,
             cambio["actividad"],
             cambio["columna"],
             cambio["valor_anterior"],
-            cambio["valor_nuevo"]
+            cambio["valor_nuevo"],
+            cambio.get("observacion", "Modificación realizada.")
         ])
 
     wb.save(ruta_registro)

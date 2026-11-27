@@ -9,6 +9,7 @@ from modules.transformar_siebel import transformar_descripcion
 CONTROL_RPA = "Control_RPA"
 ENCABEZADOS_CONTROL_RPA = [
     "Num_Actividad",
+    "Codigo_NC",
     "Descripcion_Siebel_Original",
     "Responsable_Siebel_Original",
     "Descripcion_Act",
@@ -82,7 +83,8 @@ def es_pendiente(valor):
     if esta_vacio(valor):
         return True
 
-    return str(valor).strip().upper() == "POR DEFINIR"
+    valor_normalizado = str(valor).strip().upper()
+    return valor_normalizado in {"POR DEFINIR", "N/A", "#VALORMÚLTIP"}
 
 
 def buscar_columna(ws, encabezado):
@@ -127,22 +129,28 @@ def rellenar_bo(
     # --------------------------------------------------------
 
     actividades_pendientes = []
+    actividades_vistas = set()
 
     for fila in range(2, ws_bo.max_row + 1):
 
         actividad = ws_bo.cell(fila, 11).value  # K
         descripcion_act = ws_bo.cell(fila, 25).value  # Y
+        area_aprueba = ws_bo.cell(fila, 28).value  # AB
 
-        if es_pendiente(descripcion_act):
+        # Fase 1: la actividad se selecciona si Y o AB está pendiente.
+        if es_pendiente(descripcion_act) or es_pendiente(area_aprueba):
 
             if not esta_vacio(actividad):
 
                 actividad = str(actividad).strip()
 
-                actividades_pendientes.append({
-                    "fila": fila,
-                    "actividad": actividad
-                })
+                # Evitar repetir el mismo número de actividad en la consulta.
+                if actividad not in actividades_vistas:
+                    actividades_vistas.add(actividad)
+                    actividades_pendientes.append({
+                        "fila": fila,
+                        "actividad": actividad
+                    })
 
     print(
         f"\nActividades pendientes detectadas: "
@@ -237,6 +245,7 @@ def rellenar_bo(
     # --------------------------------------------------------
 
     # K  = Num_Actividad
+    # V  = Código NC
     # Y  = Descripcion_Act
     # Z  = Motivo Cliente
     # AA = Detalle Motivo
@@ -245,6 +254,7 @@ def rellenar_bo(
     # AI = Responsable
 
     COL_ACTIVIDAD = 11
+    COL_CODIGO_NC = 22
     COL_DESCRIPCION = 25
     COL_MOTIVO = 26
     COL_DETALLE = 27
@@ -257,18 +267,17 @@ def rellenar_bo(
     # --------------------------------------------------------
 
     cambios = []
-
     actividades_no_encontradas = []
     descripciones_invalidas = []
-
     filas_procesadas = 0
     registros_control = []
 
     columnas_control = {
+        COL_CODIGO_NC: "Codigo_NC",
         COL_DESCRIPCION: "Descripcion_Act",
         COL_MOTIVO: "Motivo Cliente",
         COL_DETALLE: "Detalle Motivo",
-        COL_AREA: "\u00c1rea_Aprueba",
+        COL_AREA: "Área_Aprueba",
         COL_APROBADOR: "Aprobador",
         COL_RESPONSABLE: "Responsable"
     }
@@ -277,28 +286,20 @@ def rellenar_bo(
 
         fila_bo = elemento["fila"]
         actividad = elemento["actividad"]
+        print(f"\\nProcesando: {actividad}")
 
-        print(f"\nProcesando: {actividad}")
-
-        registro_control = {
-            encabezado: None
-            for encabezado in ENCABEZADOS_CONTROL_RPA
-        }
+        registro_control = {encabezado: None for encabezado in ENCABEZADOS_CONTROL_RPA}
         registro_control["Num_Actividad"] = actividad
         observaciones = []
         datos_incompletos = []
 
-        # Buscar en el export de Siebel
         registro_siebel = datos_siebel.get(actividad)
 
         if registro_siebel is None:
-
-            print("  No se encontr\u00f3 en el export de Siebel.")
+            print("  No se encontró en el export de Siebel.")
             actividades_no_encontradas.append(actividad)
             registro_control["Estado_Procesamiento"] = "ERROR"
-            registro_control["Observacion"] = (
-                "Actividad no encontrada en el export de Siebel."
-            )
+            registro_control["Observacion"] = "Actividad no encontrada en el export de Siebel."
             registros_control.append(registro_control)
             continue
 
@@ -310,116 +311,63 @@ def rellenar_bo(
         if esta_vacio(descripcion):
             observaciones.append("Descripción de Siebel vacía.")
             datos_incompletos.append(True)
-
         if esta_vacio(responsable_siebel):
             observaciones.append("Responsable original de Siebel vacío.")
             datos_incompletos.append(True)
 
-        # Transformar descripción con la lógica existente
-        datos_transformados = transformar_descripcion(
-            descripcion
-        )
+        datos_transformados = transformar_descripcion(descripcion)
 
         if datos_transformados is None:
-
             print("  Descripción inválida o no reconocida.")
             descripciones_invalidas.append(actividad)
             registro_control["Estado_Procesamiento"] = "INCOMPLETO"
-            observaciones.append(
-                "No se pudo transformar la descripción de Siebel."
-            )
+            observaciones.append("No se pudo transformar la descripción de Siebel.")
             registro_control["Observacion"] = " ".join(observaciones)
             registros_control.append(registro_control)
             continue
 
         filas_procesadas += 1
 
-        # ----------------------------------------------------
-        # PREPARAR VALORES
-        # ----------------------------------------------------
-
+        # Fase 2: calcular y evaluar cada campo independientemente.
         valores_nuevos = {
-
-            COL_DESCRIPCION:
-                datos_transformados["descripcion_original"],
-
-            COL_MOTIVO:
-                MAPA_MOTIVO.get(
-                    datos_transformados["cod_nc"]
-                ),
-
-            COL_DETALLE:
-                MAPA_DETALLE.get(
-                    datos_transformados["codigo_completo"]
-                ),
-
-            COL_AREA:
-                datos_transformados["area"],
-
-            COL_APROBADOR:
-                datos_transformados["aprobador"],
-
-            COL_RESPONSABLE:
-                (
-                    datos_transformados["tipo"]
-                )
+            COL_CODIGO_NC: datos_transformados.get("cod_nc"),
+            COL_DESCRIPCION: datos_transformados.get("descripcion_original"),
+            COL_MOTIVO: MAPA_MOTIVO.get(datos_transformados.get("cod_nc")),
+            COL_DETALLE: MAPA_DETALLE.get(datos_transformados.get("codigo_completo")),
+            COL_AREA: datos_transformados.get("area"),
+            COL_APROBADOR: datos_transformados.get("aprobador"),
+            COL_RESPONSABLE: datos_transformados.get("tipo")
         }
 
         for columna, valor_nuevo in valores_nuevos.items():
-
             encabezado_control = columnas_control[columna]
+            celda = ws_bo.cell(fila_bo, columna)
+            valor_anterior = celda.value
 
             if valor_nuevo is None or esta_vacio(valor_nuevo):
-                observaciones.append(
-                    f"No se obtuvo un valor para {encabezado_control}."
-                )
+                observaciones.append(f"No se obtuvo un valor para {encabezado_control}.")
                 datos_incompletos.append(True)
-            else:
-                # Es el resultado que la lógica intenta asignar al BO.
-                registro_control[encabezado_control] = valor_nuevo
-
-            if valor_nuevo is None:
+                registro_control[encabezado_control] = valor_anterior
                 continue
 
-            celda = ws_bo.cell(
-                fila_bo,
-                columna
-            )
+            # Guardar en el control el valor fuente/calculado aunque el BO se conserve.
+            registro_control[encabezado_control] = valor_nuevo
 
-            if es_pendiente(celda.value):
-
-                valor_anterior = celda.value
-
+            if es_pendiente(valor_anterior):
                 celda.value = valor_nuevo
-
                 cambios.append({
                     "fila": fila_bo,
                     "actividad": actividad,
-                    "columna": ws_bo.cell(
-                        1,
-                        columna
-                    ).value,
+                    "columna": ws_bo.cell(1, columna).value or encabezado_control,
                     "valor_anterior": valor_anterior,
                     "valor_nuevo": valor_nuevo
                 })
-
-                print(
-                    f"  Modificado: "
-                    f"{ws_bo.cell(1, columna).value} "
-                    f"-> {valor_nuevo}"
-                )
-
+                print(f"  Modificado: {encabezado_control} -> {valor_nuevo}")
             else:
-
                 observaciones.append(
-                    f"{encabezado_control}: BO conservó el valor existente; "
-                    "no se sobrescribió."
+                    f"{encabezado_control}: valor existente conservado; no se sobrescribió."
                 )
-                print(
-                    f"  Sin cambios: "
-                    f"{ws_bo.cell(1, columna).value} "
-                    f"(ya tiene valor)"
-                )
+                print(f"  Sin cambios: {encabezado_control} (valor existente conservado)")
 
         registro_control["Estado_Procesamiento"] = (
             "INCOMPLETO" if datos_incompletos else "COMPLETADO"
