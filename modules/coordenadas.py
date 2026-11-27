@@ -53,6 +53,8 @@ CERRAR = (1165, 651)
 
 def abrir_edge():
 
+    print("  - Abriendo Edge...", flush=True)
+
     print("Abriendo Microsoft Edge...")
 
     os.system("start microsoft-edge:")
@@ -64,6 +66,8 @@ def abrir_edge():
 # =========================================================
 
 def login_siebel():
+
+    print("  - Accediendo a Siebel e iniciando sesion...", flush=True)
     print("Ingresando a Siebel...")
 
     pyautogui.click(*HERRAMIENTAS)
@@ -87,6 +91,8 @@ def login_siebel():
 # =========================================================
 
 def navegar_consulta():
+
+    print("  - Navegando al modulo de consulta...", flush=True)
     print("Navegando al módulo de consulta...")
 
     pyautogui.click(*FACTURAS)
@@ -104,6 +110,8 @@ def navegar_consulta():
 # =========================================================
 
 def ejecutar_consulta(codigo_or):
+
+    print("  - Ingresando actividades y ejecutando consulta...", flush=True)
     print("Ingresando actividades para la consulta...")
 
     pyautogui.click(*NUM_ACTIVIDAD)
@@ -124,6 +132,8 @@ def ejecutar_consulta(codigo_or):
 # =========================================================
 
 def exportar_siebel(ruta_siebel):
+
+    print("  - Solicitando exportacion y esperando el archivo...", flush=True)
     print("Exportando resultados de Siebel...")
 
     pyautogui.click(*MENU)

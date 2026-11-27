@@ -34,7 +34,7 @@ def fila_requiere_busqueda(valor_descripcion, valor_area):
 
 def obtener_actividades_pendientes(ruta_bo):
 
-    print("\nRevisando actividades pendientes del BO...")
+    print("\n[2/6] Revisando actividades pendientes del BO...", flush=True)
 
     wb = load_workbook(
         ruta_bo,
@@ -170,6 +170,7 @@ def main():
     # 1. VALIDAR BO ORIGINAL
     # --------------------------------------------------------
 
+    print("\n[1/6] Verificando el archivo BO de entrada...", flush=True)
     if not os.path.exists(config.RUTA_BO):
 
         print("\nERROR: No se encontró el archivo BO.")
@@ -203,6 +204,7 @@ def main():
     # 3. CONSTRUIR CONSULTA OR
     # --------------------------------------------------------
 
+    print(f"\nActividades pendientes para consultar: {len(actividades)}", flush=True)
     codigo_or = construir_consulta_or(actividades)
 
     print("\nConsulta preparada para Siebel.")
@@ -222,12 +224,14 @@ def main():
     print("INICIANDO AUTOMATIZACIÓN DE SIEBEL")
     print("=" * 60)
 
+    print("\n[3/6] Iniciando extraccion desde Siebel...", flush=True)
     obtener_export_siebel(codigo_or, ruta_siebel)
 
     # --------------------------------------------------------
     # 6. VALIDAR EXPORT NUEVO
     # --------------------------------------------------------
 
+    print("\n[4/6] Validando el archivo exportado...", flush=True)
     validar_export_siebel(ruta_siebel)
 
     # --------------------------------------------------------
@@ -238,6 +242,7 @@ def main():
     print("INICIANDO RELLENADO DEL BO")
     print("=" * 60)
 
+    print("\n[5/6] Procesando el BO y rellenando campos pendientes...", flush=True)
     cambios = rellenar_bo(
         ruta_bo=config.RUTA_BO,
         ruta_siebel=ruta_siebel,
@@ -248,6 +253,7 @@ def main():
     # 8. REGISTRAR MODIFICACIONES
     # --------------------------------------------------------
 
+    print("\n[6/6] Guardando el registro de modificaciones...", flush=True)
     guardar_registro(
         cambios,
         config.RUTA_REGISTRO
